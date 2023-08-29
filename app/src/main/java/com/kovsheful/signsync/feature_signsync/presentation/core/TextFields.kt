@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kovsheful.signsync.ui.theme.ErrorColor
@@ -26,10 +28,10 @@ import com.kovsheful.signsync.ui.theme.TextFieldColor
 import com.kovsheful.signsync.ui.theme.poppinsItalic
 import com.kovsheful.signsync.ui.theme.typography
 
-
-sealed class ContactsTextFieldType(val labelText: String, val keyboardType: KeyboardType) {
-    class Name(label: String) : ContactsTextFieldType(label, KeyboardType.Text)
-    class Email(label: String) : ContactsTextFieldType(label, KeyboardType.Email)
+sealed class ContactsTextFieldType(val text: String, val keyboardType: KeyboardType) {
+    data object Name : ContactsTextFieldType(text = "Name", keyboardType = KeyboardType.Text)
+    data object Email : ContactsTextFieldType(text = "Email", keyboardType = KeyboardType.Email)
+    data object Password : ContactsTextFieldType(text = "Password", keyboardType = KeyboardType.Password)
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true)
@@ -39,7 +41,7 @@ fun PrevContactsTextField() {
     ContactsTextField(
         value = prev,
         onValueChange = { prev = it },
-        textFieldType = ContactsTextFieldType.Name("Name")
+        textFieldType = ContactsTextFieldType.Name,
     )
 }
 
@@ -52,17 +54,17 @@ fun ContactsTextField(
 ) {
 
     val isPlaceholderDisplayed = remember { mutableStateOf(true) }
-    val placeholder = "Enter your ${textFieldType.labelText}..."
+    val placeholder = "Enter your ${textFieldType.text.lowercase()}..."
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = "${textFieldType.labelText}*",
+            text = "${textFieldType.text}*",
             style = typography.labelMedium
         )
         BasicTextField(
-            value = if (isPlaceholderDisplayed.value) placeholder else value,
+            value = value,
             onValueChange = {
                 onValueChange(it)
                 isPlaceholderDisplayed.value = it.isEmpty()
@@ -73,17 +75,25 @@ fun ContactsTextField(
                     color = if (validityState) TextFieldColor else ErrorColor,
                     shape = RoundedCornerShape(5.dp)
                 )
-                .fillMaxWidth(),
-            textStyle = if (isPlaceholderDisplayed.value) {
-                typography.bodyMedium.copy(
-                    fontFamily = poppinsItalic,
-                    color = SecondaryText)
-            } else typography.bodyMedium,
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            textStyle = typography.bodyMedium,
             keyboardOptions = KeyboardOptions(
                 keyboardType = textFieldType.keyboardType,
                 imeAction = ImeAction.Done // Type of "Enter" button on keyboard
             ),
             singleLine = true,
+            decorationBox = { innerTextField ->
+                if (isPlaceholderDisplayed.value) {
+                    Text(
+                        text = placeholder,
+                        style = typography.bodyMedium.copy(
+                            fontFamily = poppinsItalic,
+                            color = SecondaryText)
+                    )
+                }
+                innerTextField()
+            }
         )
     }
 }
