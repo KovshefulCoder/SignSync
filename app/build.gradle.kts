@@ -85,7 +85,6 @@ dependencies {
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.compose.material:material-android:1.5.0")
 
-
     // Compose dependencies
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
@@ -97,8 +96,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
 
     //Dagger - Hilt
-    implementation("com.google.dagger:hilt-android:2.46.1")
-    kapt ("com.google.dagger:hilt-android-compiler:2.46.1")
+    implementation("com.google.dagger:hilt-android:2.47")
+    kapt ("com.google.dagger:hilt-android-compiler:2.47")
     kapt ("androidx.hilt:hilt-compiler:1.0.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
 
