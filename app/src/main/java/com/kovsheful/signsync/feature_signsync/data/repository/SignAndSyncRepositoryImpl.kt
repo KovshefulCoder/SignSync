@@ -15,4 +15,12 @@ class SignAndSyncRepositoryImpl(
         userDao.upsert(user)
     }
 
+    override suspend fun getUserPasswordByID(id: Int): String {
+        return userDao.getUserPasswordByID(id)
+    }
+
+    override suspend fun clearUser() {
+        userDao.clearUser()
+    }
+
 }

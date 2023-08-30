@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kovsheful.signsync.feature_signsync.domain.models.User
 import com.kovsheful.signsync.feature_signsync.domain.use_cases.UserUseCases
-import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextFieldType
+import com.kovsheful.signsync.feature_signsync.presentation.core.RegistrationScreenTextFieldTypes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,19 +20,25 @@ class RegistrationViewModel @Inject constructor (
     private val _state = MutableStateFlow(RegistrationState())
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
 
-    fun updateDataField(fieldName: ContactsTextFieldType, fieldValue: String) {
+    init {
+        viewModelScope.launch {
+            userUseCases.clearUserOnStart()
+        }
+    }
+
+    fun updateDataField(fieldName: RegistrationScreenTextFieldTypes, fieldValue: String) {
         viewModelScope.launch {
             _state.update { value ->
                 when (fieldName) {
-                    ContactsTextFieldType.Name-> value.copy(
+                    RegistrationScreenTextFieldTypes.Name-> value.copy(
                         name = fieldValue,
                         isNameValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
                     )
-                    ContactsTextFieldType.Email -> value.copy(
+                    RegistrationScreenTextFieldTypes.Email -> value.copy(
                         email = fieldValue,
                         isEmailValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
                     )
-                    ContactsTextFieldType.Password -> value.copy(
+                    RegistrationScreenTextFieldTypes.Password -> value.copy(
                         password = fieldValue,
                         isPasswordValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
                     )

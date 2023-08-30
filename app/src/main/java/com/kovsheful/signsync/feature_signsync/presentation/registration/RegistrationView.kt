@@ -32,8 +32,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovsheful.signsync.R
 import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextField
-import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextFieldType
+import com.kovsheful.signsync.feature_signsync.presentation.core.RegistrationScreenTextFieldTypes
 import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextField
+import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextFieldTypes
 import com.kovsheful.signsync.feature_signsync.presentation.core.TextFieldValidityState
 import com.kovsheful.signsync.ui.theme.Background
 import com.kovsheful.signsync.ui.theme.PrimaryColor
@@ -43,7 +44,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @RootNavGraph(start = true)
-@Destination
+@Destination("Registration")
 @Composable
 internal fun RegistrationView(
     navigator: DestinationsNavigator
@@ -55,6 +56,12 @@ internal fun RegistrationView(
             viewModel.onSubmitClicked()
             if (state.isNameValid && state.isEmailValid && state.isPasswordValid) {
                 Log.i("RegistrationView", "Success")
+                // Avoid back navigation to Registration screen with popUpTo
+                navigator.navigate(route = "Profile") {
+                    popUpTo("Registration") {
+                        inclusive = true
+                    }
+                }
             }
         },
         name = state.name,
@@ -84,7 +91,7 @@ private fun RegistrationView(
     name: String,
     email: String,
     password: String,
-    onDataChanged: (ContactsTextFieldType, String) -> Unit,
+    onDataChanged: (RegistrationScreenTextFieldTypes, String) -> Unit,
     textFieldsValidity: Triple<Boolean, Boolean, Boolean>
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
@@ -127,9 +134,9 @@ private fun RegistrationView(
                 ContactsTextField(
                     value = name,
                     onValueChange = { newValue ->
-                        onDataChanged(ContactsTextFieldType.Name, newValue)
+                        onDataChanged(RegistrationScreenTextFieldTypes.Name, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Name,
+                    textFieldType = RegistrationScreenTextFieldTypes.Name,
                     validityState = if (textFieldsValidity.first) {
                         TextFieldValidityState.Valid
                     } else {
@@ -140,9 +147,9 @@ private fun RegistrationView(
                 ContactsTextField(
                     value = email,
                     onValueChange = { newValue ->
-                        onDataChanged(ContactsTextFieldType.Email, newValue)
+                        onDataChanged(RegistrationScreenTextFieldTypes.Email, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Email,
+                    textFieldType = RegistrationScreenTextFieldTypes.Email,
                     validityState = if (textFieldsValidity.second) {
                         TextFieldValidityState.Valid
                     } else {
@@ -153,9 +160,9 @@ private fun RegistrationView(
                 PasswordTextField(
                     value = password,
                     onValueChange = { newValue ->
-                        onDataChanged(ContactsTextFieldType.Password, newValue)
+                        onDataChanged(RegistrationScreenTextFieldTypes.Password, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Password,
+                    textFieldType = PasswordTextFieldTypes.Password,
                     validityState = if (textFieldsValidity.third) {
                         TextFieldValidityState.Valid
                     } else {
@@ -175,7 +182,8 @@ private fun RegistrationView(
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 SubmitButton(
-                    onClick = onRegistration
+                    onClick = onRegistration,
+                    buttonText = "Sign up"
                 )
             }
         }
@@ -184,8 +192,8 @@ private fun RegistrationView(
 
 @Composable
 fun SubmitButton(
-    buttonText: String = "Sign up",
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    buttonText: String,
 ) {
     Button(
         onClick = onClick,

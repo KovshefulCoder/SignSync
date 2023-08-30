@@ -34,15 +34,19 @@ import androidx.compose.ui.unit.dp
 import com.kovsheful.signsync.R
 import com.kovsheful.signsync.ui.theme.ErrorColor
 import com.kovsheful.signsync.ui.theme.SecondaryText
-import com.kovsheful.signsync.ui.theme.TextFieldColor
 import com.kovsheful.signsync.ui.theme.poppinsItalic
 import com.kovsheful.signsync.ui.theme.typography
 
-sealed class ContactsTextFieldType(val text: String, val keyboardType: KeyboardType) {
-    data object Name : ContactsTextFieldType(text = "Name", keyboardType = KeyboardType.Text)
-    data object Email : ContactsTextFieldType(text = "Email", keyboardType = KeyboardType.Email)
-    data object Password :
-        ContactsTextFieldType(text = "Password", keyboardType = KeyboardType.Password)
+sealed class RegistrationScreenTextFieldTypes(val text: String, val keyboardType: KeyboardType) {
+    data object Name : RegistrationScreenTextFieldTypes(text = "Name", keyboardType = KeyboardType.Text)
+    data object Email : RegistrationScreenTextFieldTypes(text = "Email", keyboardType = KeyboardType.Email)
+    data object Password : RegistrationScreenTextFieldTypes(text = "Password", keyboardType = KeyboardType.Password)
+}
+
+sealed class PasswordTextFieldTypes(val text: String, val keyboardType: KeyboardType = KeyboardType.Password) {
+    data object Password : PasswordTextFieldTypes(text = "Password", keyboardType = KeyboardType.Password)
+    data object CurrentPassword : PasswordTextFieldTypes(text = "Current password")
+    data object NewPassword : PasswordTextFieldTypes(text = "New password")
 }
 
 sealed class TextFieldValidityState {
@@ -66,7 +70,7 @@ fun PrevContactsTextField() {
     ContactsTextField(
         value = prev,
         onValueChange = { prev = it },
-        textFieldType = ContactsTextFieldType.Name,
+        textFieldType = RegistrationScreenTextFieldTypes.Name,
     )
 }
 
@@ -74,7 +78,7 @@ fun PrevContactsTextField() {
 fun ContactsTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    textFieldType: ContactsTextFieldType,
+    textFieldType: RegistrationScreenTextFieldTypes,
     validityState: TextFieldValidityState = TextFieldValidityState.Valid,
 ) {
     val isPlaceholderDisplayed = remember { mutableStateOf(true) }
@@ -154,7 +158,7 @@ fun PrevPasswordTextField() {
     PasswordTextField(
         value = prev,
         onValueChange = { prev = it },
-        textFieldType = ContactsTextFieldType.Password,
+        textFieldType = PasswordTextFieldTypes.Password,
         validityState = TextFieldValidityState.Invalid
     )
 }
@@ -164,7 +168,7 @@ fun PrevPasswordTextField() {
 fun PasswordTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    textFieldType: ContactsTextFieldType,
+    textFieldType: PasswordTextFieldTypes,
     validityState: TextFieldValidityState = TextFieldValidityState.Valid
 ) {
     val isPlaceholderDisplayed = remember { mutableStateOf(true) }
@@ -184,10 +188,12 @@ fun PasswordTextField(
                 style = typography.labelMedium,
                 color = colorBasedOnValidity(validityState)
             )
-            Text(
-                text = "*",
-                style = typography.labelMedium
-            )
+            if (textFieldType == PasswordTextFieldTypes.Password) {
+                Text(
+                    text = "*",
+                    style = typography.labelMedium
+                )
+            }
         }
         Spacer(modifier = Modifier.height(2.dp))
         BasicTextField(
