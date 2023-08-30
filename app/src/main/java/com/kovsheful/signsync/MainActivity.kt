@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.kovsheful.signsync.feature_signsync.presentation.registration.NavGraphs
+import com.kovsheful.signsync.feature_signsync.presentation.NavGraphs
 import com.kovsheful.signsync.ui.theme.Background
 import com.kovsheful.signsync.ui.theme.SignSyncTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
