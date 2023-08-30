@@ -54,7 +54,6 @@ internal fun RegistrationView(
         onRegistration = {
             viewModel.onSubmitClicked()
             if (state.isNameValid && state.isEmailValid && state.isPasswordValid) {
-                //navigator.navigate("Profile")
                 Log.i("RegistrationView", "Success")
             }
         },
@@ -80,7 +79,7 @@ fun PrevRegistrationView() {
 }
 
 @Composable
-fun RegistrationView(
+private fun RegistrationView(
     onRegistration: () -> Unit,
     name: String,
     email: String,
