@@ -20,10 +20,32 @@ class RegistrationViewModel @Inject constructor () : ViewModel()  {
         viewModelScope.launch {
             _state.update { value ->
                 when (fieldName) {
-                    ContactsTextFieldType.Name-> value.copy(name = fieldValue)
-                    ContactsTextFieldType.Email -> value.copy(email = fieldValue)
-                    ContactsTextFieldType.Password -> value.copy(password = fieldValue)
+                    ContactsTextFieldType.Name-> value.copy(
+                        name = fieldValue,
+                        isNameValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
+                    )
+                    ContactsTextFieldType.Email -> value.copy(
+                        email = fieldValue,
+                        isEmailValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
+                    )
+                    ContactsTextFieldType.Password -> value.copy(
+                        password = fieldValue,
+                        isPasswordValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
+                    )
                 }
+            }
+        }
+    }
+
+    fun onSubmitClicked() {
+        viewModelScope.launch {
+            _state.update { value ->
+                value.copy(
+                    submitClicked = true,
+                    isNameValid = value.name.isNotEmpty(),
+                    isEmailValid = value.email.isNotEmpty(),
+                    isPasswordValid = value.password.isNotEmpty()
+                )
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.kovsheful.signsync.feature_signsync.presentation.registration
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
@@ -33,6 +33,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovsheful.signsync.R
 import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextField
 import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextFieldType
+import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextField
+import com.kovsheful.signsync.feature_signsync.presentation.core.TextFieldValidityState
 import com.kovsheful.signsync.ui.theme.Background
 import com.kovsheful.signsync.ui.theme.PrimaryColor
 import com.kovsheful.signsync.ui.theme.typography
@@ -50,11 +52,17 @@ internal fun RegistrationView(
     val state by viewModel.state.collectAsStateWithLifecycle()
     RegistrationView(
         onRegistration = {
+            viewModel.onSubmitClicked()
+            if (state.isNameValid && state.isEmailValid && state.isPasswordValid) {
+                //navigator.navigate("Profile")
+                Log.i("RegistrationView", "Success")
+            }
         },
         name = state.name,
         email = state.email,
         password = state.password,
         onDataChanged = viewModel::updateDataField,
+        textFieldsValidity = Triple(state.isNameValid, state.isEmailValid, state.isPasswordValid)
     )
 }
 
@@ -66,7 +74,8 @@ fun PrevRegistrationView() {
         name = "",
         email = "",
         password = "",
-        onDataChanged = { _, _ -> }
+        onDataChanged = { _, _ -> },
+        textFieldsValidity = Triple(true, true, true)
     )
 }
 
@@ -77,6 +86,7 @@ fun RegistrationView(
     email: String,
     password: String,
     onDataChanged: (ContactsTextFieldType, String) -> Unit,
+    textFieldsValidity: Triple<Boolean, Boolean, Boolean>
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
@@ -110,34 +120,61 @@ fun RegistrationView(
                 ) {
                     Text(
                         text = "Welcome aboard!",
-                        style = typography.displayMedium
-                    )
+                        style = typography.displayMedium,
+
+                        )
                 }
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 ContactsTextField(
                     value = name,
                     onValueChange = { newValue ->
                         onDataChanged(ContactsTextFieldType.Name, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Name
+                    textFieldType = ContactsTextFieldType.Name,
+                    validityState = if (textFieldsValidity.first) {
+                        TextFieldValidityState.Valid
+                    } else {
+                        TextFieldValidityState.Empty
+                    }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(if (textFieldsValidity.first) 24.dp else 6.dp))
                 ContactsTextField(
                     value = email,
                     onValueChange = { newValue ->
                         onDataChanged(ContactsTextFieldType.Email, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Email
+                    textFieldType = ContactsTextFieldType.Email,
+                    validityState = if (textFieldsValidity.second) {
+                        TextFieldValidityState.Valid
+                    } else {
+                        TextFieldValidityState.Empty
+                    }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                ContactsTextField(
+                Spacer(modifier = Modifier.height(if (textFieldsValidity.second) 24.dp else 6.dp))
+                PasswordTextField(
                     value = password,
                     onValueChange = { newValue ->
                         onDataChanged(ContactsTextFieldType.Password, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Password
+                    textFieldType = ContactsTextFieldType.Password,
+                    validityState = if (textFieldsValidity.third) {
+                        TextFieldValidityState.Valid
+                    } else {
+                        TextFieldValidityState.Empty
+                    }
                 )
-                Spacer(modifier = Modifier.height(60.dp))
+                Spacer(modifier = Modifier.height(if (textFieldsValidity.third) 8.dp else 4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "* - required field",
+                        style = typography.labelMedium
+                    )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
                 SubmitButton(
                     onClick = onRegistration
                 )
