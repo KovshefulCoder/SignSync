@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Sign &amp; Sync</string>
+    <string name="textfield_placeholder_prefix">Ожидается</string>
+    <string name="textfield_empty_bottomtext">Поле не может быть пустым</string>
+    <string name="textfield_invalid_password_bottomtext">Неверный пароль, повторите попытку</string>
+    <string name="password_icon_description">Иконка сокрытия и показа пароля</string>
+    <string name="required_field_star">*</string>
+    <string name="welcome_text">Добро пожаловать!</string>
+    <string name="required_field_hint_text">* - обязательные поля</string>
+    <string name="registration_button_text">Зарегистрироваться</string>
+    <string name="profile_welcome_text">"Добро пожаловать, "</string>
+    <string name="contacts_title_text">Контакты</string>
+    <string name="contacts_editicon_description">Иконка редактирования контактов</string>
+    <string name="name_conatacts_list_text">Имя</string>
+    <string name="email_conatacts_list_text">Почта</string>
+    <string name="profile_editsubmit_button_text">Сменить пароль</string>
+    <string name="update_password_title_text">Поменять пароль</string>
 </resources>
