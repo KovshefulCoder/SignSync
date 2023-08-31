@@ -1,5 +1,6 @@
 package com.kovsheful.signsync.feature_signsync.presentation.registration
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kovsheful.signsync.feature_signsync.domain.models.User
@@ -14,9 +15,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor (
+class RegistrationViewModel @Inject constructor(
     private val userUseCases: UserUseCases
-) : ViewModel()  {
+) : ViewModel() {
     private val _state = MutableStateFlow(RegistrationState())
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
 
@@ -28,16 +29,19 @@ class RegistrationViewModel @Inject constructor (
 
     fun updateDataField(fieldName: RegistrationScreenTextFieldTypes, fieldValue: String) {
         viewModelScope.launch {
+            Log.i("RegistrationViewModel", state.value.toString() + "new: $fieldValue")
             _state.update { value ->
                 when (fieldName) {
-                    RegistrationScreenTextFieldTypes.Name-> value.copy(
+                    RegistrationScreenTextFieldTypes.Name -> value.copy(
                         name = fieldValue,
                         isNameValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
                     )
+
                     RegistrationScreenTextFieldTypes.Email -> value.copy(
                         email = fieldValue,
                         isEmailValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
                     )
+
                     RegistrationScreenTextFieldTypes.Password -> value.copy(
                         password = fieldValue,
                         isPasswordValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
@@ -48,16 +52,17 @@ class RegistrationViewModel @Inject constructor (
     }
 
     fun onSubmitClicked() {
+        _state.update { value ->
+            value.copy(
+                submitClicked = true,
+                isNameValid = value.name.isNotEmpty(),
+                isEmailValid = value.email.isNotEmpty(),
+                isPasswordValid = value.password.isNotEmpty()
+            )
+        }
         viewModelScope.launch {
-            _state.update { value ->
-                value.copy(
-                    submitClicked = true,
-                    isNameValid = value.name.isNotEmpty(),
-                    isEmailValid = value.email.isNotEmpty(),
-                    isPasswordValid = value.password.isNotEmpty()
-                )
-            }
-            if (state.value.isNameValid && state.value.isEmailValid && state.value.isPasswordValid) {
+            if (state.value.isNameValid && state.value.isEmailValid && state.value.isPasswordValid)
+            {
                 userUseCases.addOrUpdateUser(
                     User(
                         name = state.value.name,

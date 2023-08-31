@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovsheful.signsync.feature_signsync.core.util.ResourceStatus
 import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextField
 import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextFieldTypes
+import com.kovsheful.signsync.feature_signsync.presentation.core.TextFieldValidityState
 import com.kovsheful.signsync.feature_signsync.presentation.registration.SubmitButton
 import com.kovsheful.signsync.ui.theme.Background
 import com.kovsheful.signsync.ui.theme.BlockColor
@@ -54,7 +55,11 @@ internal fun ProfileView() {
         onChangePassword = viewModel::updatePassword,
         currentPassword = state.currentPassword,
         newPassword = state.newPassword,
-        flowEvent = event
+        textFieldsValidity = Pair(
+            state.currentPasswordValidityState,
+            state.newPasswordValidityState
+        ),
+        flowEvent = event,
     )
 }
 
@@ -64,11 +69,12 @@ fun PrevProfileView() {
     ProfileView(
         name = "Денис",
         email = "2323set@gmail.com",
-        { _, _ -> },
-        {},
-        "",
-        "",
-        ResourceStatus.None<String>()
+        onPasswordChanged = { _, _ -> },
+        onChangePassword = {},
+        currentPassword = "",
+        newPassword = "",
+        textFieldsValidity = Pair(TextFieldValidityState.Valid, TextFieldValidityState.Valid),
+        flowEvent = ResourceStatus.None()
     )
 }
 
@@ -80,10 +86,12 @@ private fun ProfileView(
     onChangePassword: () -> Unit,
     currentPassword: String,
     newPassword: String,
-    flowEvent: ResourceStatus<String>
-) {
+    textFieldsValidity: Pair<TextFieldValidityState, TextFieldValidityState>,
+    flowEvent: ResourceStatus<String>,
+
+    ) {
     val snackBarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(flowEvent) {
         when (flowEvent) {
             is ResourceStatus.Success<String> -> {
                 snackBarHostState.showSnackbar(
@@ -97,6 +105,7 @@ private fun ProfileView(
                     duration = SnackbarDuration.Short
                 )
             }
+
             else -> {}
         }
     }
@@ -225,10 +234,15 @@ private fun ProfileView(
                             PasswordTextFieldTypes.CurrentPassword, newValue
                         )
                     },
-                    textFieldType = PasswordTextFieldTypes.CurrentPassword
+                    textFieldType = PasswordTextFieldTypes.CurrentPassword,
+                    validityState = textFieldsValidity.first
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                //Spacer(modifier = Modifier.height(if (textFieldsValidity.first) 24.dp else 6.dp))
+                Spacer(
+                    modifier = Modifier.height(
+                        if (textFieldsValidity.first == TextFieldValidityState.Valid) 24.dp else 6.dp
+                    )
+                )
                 PasswordTextField(
                     value = newPassword,
                     onValueChange = { newValue ->
@@ -236,7 +250,8 @@ private fun ProfileView(
                             PasswordTextFieldTypes.NewPassword, newValue
                         )
                     },
-                    textFieldType = PasswordTextFieldTypes.NewPassword
+                    textFieldType = PasswordTextFieldTypes.NewPassword,
+                    validityState = textFieldsValidity.second
                 )
                 Spacer(modifier = Modifier.height(48.dp))
                 SubmitButton(

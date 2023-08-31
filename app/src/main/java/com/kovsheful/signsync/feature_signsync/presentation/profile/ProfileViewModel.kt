@@ -1,5 +1,6 @@
 package com.kovsheful.signsync.feature_signsync.presentation.profile
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kovsheful.signsync.feature_signsync.core.util.ResourceStatus
@@ -40,19 +41,25 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun updateOneOfPasswords(fieldName: PasswordTextFieldTypes, fieldValue: String) {
+        fun validityStateBasedOnFieldState(): TextFieldValidityState = if (!state.value.submitClicked) {
+            TextFieldValidityState.Valid
+        } else if (fieldValue.isEmpty()) {
+            TextFieldValidityState.Empty
+        } else {
+            TextFieldValidityState.Valid
+        }
         viewModelScope.launch {
+            Log.i("ProfileViewModel", state.value.toString() + "new: $fieldValue")
             _state.update { value ->
                 when (fieldName) {
                     PasswordTextFieldTypes.CurrentPassword -> value.copy(
                         currentPassword = fieldValue,
-                        //isCurrentPasswordValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
+                        currentPasswordValidityState = validityStateBasedOnFieldState()
                     )
-
                     PasswordTextFieldTypes.NewPassword -> value.copy(
                         newPassword = fieldValue,
-                        //isNewPasswordValid = if (!state.value.submitClicked) true else fieldValue.isNotEmpty()
+                        newPasswordValidityState = validityStateBasedOnFieldState()
                     )
-
                     else -> {
                         value
                     }
@@ -66,45 +73,45 @@ class ProfileViewModel @Inject constructor(
             _state.update { value ->
                 value.copy(
                     submitClicked = true,
-                    currentPasswordValidityState = if (!state.value.submitClicked) {
-                        TextFieldValidityState.Valid
-                    } else if (value.currentPassword.isNotEmpty()) {
+                    currentPasswordValidityState = if (value.currentPassword.isEmpty()) {
                         TextFieldValidityState.Empty
                     } else {
                         TextFieldValidityState.Valid
                     },
-                    newPasswordValidityState = if (!state.value.submitClicked) {
-                        TextFieldValidityState.Valid
-                    } else if (value.newPassword.isNotEmpty()) {
+                    newPasswordValidityState = if (value.newPassword.isEmpty()) {
                         TextFieldValidityState.Empty
                     } else {
                         TextFieldValidityState.Valid
                     }
                 )
             }
-            val currentPassword = userUseCases.getUserPasswordByID(state.value.userID)
-            if (currentPassword == state.value.currentPassword) {
-                userUseCases.addOrUpdateUser(
-                    User(
-                        id = state.value.userID,
-                        name = state.value.name,
-                        email = state.value.email,
-                        password = state.value.newPassword
+            if (state.value.currentPasswordValidityState == TextFieldValidityState.Valid &&
+                state.value.newPasswordValidityState == TextFieldValidityState.Valid)
+            {
+                val currentPassword = userUseCases.getUserPasswordByID(state.value.userID)
+                if (currentPassword == state.value.currentPassword) {
+                    userUseCases.addOrUpdateUser(
+                        User(
+                            id = state.value.userID,
+                            name = state.value.name,
+                            email = state.value.email,
+                            password = state.value.newPassword
+                        )
                     )
-                )
-                _eventFlow.emit(ResourceStatus.Success("Пароль успешно изменен"))
-                _state.update { value ->
-                    value.copy(
-                        currentPassword = "",
-                        newPassword = ""
-                    )
-                }
-            } else {
-                _eventFlow.emit(ResourceStatus.Error("Неверный текущий пароль"))
-                _state.update { value ->
-                    value.copy(
-                        currentPasswordValidityState = TextFieldValidityState.Invalid
-                    )
+                    _eventFlow.emit(ResourceStatus.Success("Пароль успешно изменен"))
+                    _state.update { value ->
+                        value.copy(
+                            currentPassword = "",
+                            newPassword = ""
+                        )
+                    }
+                } else {
+                    _eventFlow.emit(ResourceStatus.Error("Неверный текущий пароль"))
+                    _state.update { value ->
+                        value.copy(
+                            currentPasswordValidityState = TextFieldValidityState.Invalid
+                        )
+                    }
                 }
             }
         }

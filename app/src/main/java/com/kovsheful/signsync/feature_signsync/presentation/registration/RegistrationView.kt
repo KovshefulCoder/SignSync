@@ -42,6 +42,7 @@ import com.kovsheful.signsync.ui.theme.typography
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.yield
 
 @RootNavGraph(start = true)
 @Destination("Registration")
@@ -51,19 +52,20 @@ internal fun RegistrationView(
 ) {
     val viewModel: RegistrationViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    RegistrationView(
-        onRegistration = {
-            viewModel.onSubmitClicked()
-            if (state.isNameValid && state.isEmailValid && state.isPasswordValid) {
-                Log.i("RegistrationView", "Success")
-                // Avoid back navigation to Registration screen with popUpTo
-                navigator.navigate(route = "Profile") {
-                    popUpTo("Registration") {
-                        inclusive = true
-                    }
+    fun onRegistration() {
+        viewModel.onSubmitClicked()
+        if (state.isNameValid && state.isEmailValid && state.isPasswordValid &&
+            state.email.isNotEmpty() && state.name.isNotEmpty() && state.password.isNotEmpty()) {
+            // Avoid back navigation to Registration screen with popUpTo
+            navigator.navigate(route = "Profile") {
+                popUpTo("Registration") {
+                    inclusive = true
                 }
             }
-        },
+        }
+    }
+    RegistrationView(
+        onRegistration = { onRegistration() },
         name = state.name,
         email = state.email,
         password = state.password,
