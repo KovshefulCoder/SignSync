@@ -49,7 +49,6 @@ class ProfileViewModel @Inject constructor(
             TextFieldValidityState.Valid
         }
         viewModelScope.launch {
-            Log.i("ProfileViewModel", state.value.toString() + "new: $fieldValue")
             _state.update { value ->
                 when (fieldName) {
                     PasswordTextFieldTypes.CurrentPassword -> value.copy(

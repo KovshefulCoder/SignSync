@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -38,15 +39,22 @@ import com.kovsheful.signsync.ui.theme.poppinsItalic
 import com.kovsheful.signsync.ui.theme.typography
 
 sealed class RegistrationScreenTextFieldTypes(val text: String, val keyboardType: KeyboardType) {
-    data object Name : RegistrationScreenTextFieldTypes(text = "Name", keyboardType = KeyboardType.Text)
-    data object Email : RegistrationScreenTextFieldTypes(text = "Email", keyboardType = KeyboardType.Email)
-    data object Password : RegistrationScreenTextFieldTypes(text = "Password", keyboardType = KeyboardType.Password)
+    data object Name :
+        RegistrationScreenTextFieldTypes(text = "Имя", keyboardType = KeyboardType.Text)
+    data object Email :
+        RegistrationScreenTextFieldTypes(text = "Почта", keyboardType = KeyboardType.Email)
+    data object Password :
+        RegistrationScreenTextFieldTypes(text = "Пароль", keyboardType = KeyboardType.Password)
 }
 
-sealed class PasswordTextFieldTypes(val text: String, val keyboardType: KeyboardType = KeyboardType.Password) {
-    data object Password : PasswordTextFieldTypes(text = "Password", keyboardType = KeyboardType.Password)
-    data object CurrentPassword : PasswordTextFieldTypes(text = "Current password")
-    data object NewPassword : PasswordTextFieldTypes(text = "New password")
+sealed class PasswordTextFieldTypes(
+    val text: String,
+    val keyboardType: KeyboardType = KeyboardType.Password
+) {
+    data object Password :
+        PasswordTextFieldTypes(text = "Пароль", keyboardType = KeyboardType.Password)
+    data object CurrentPassword : PasswordTextFieldTypes(text = "Текущий пароль")
+    data object NewPassword : PasswordTextFieldTypes(text = "Новый пароль")
 }
 
 sealed class TextFieldValidityState {
@@ -63,7 +71,7 @@ fun colorBasedOnValidity(
 }
 
 
-//@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true)
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF, showSystemUi = true)
 @Composable
 fun PrevContactsTextField() {
     var prev = ""
@@ -82,7 +90,8 @@ fun ContactsTextField(
     validityState: TextFieldValidityState = TextFieldValidityState.Valid,
 ) {
     val isPlaceholderDisplayed = remember { mutableStateOf(true) }
-    val placeholder = "Enter your ${textFieldType.text.lowercase()}..."
+    val placeholder =
+        stringResource(R.string.textfield_placeholder_prefix) + " " + textFieldType.text.lowercase() + "..."
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
@@ -98,7 +107,7 @@ fun ContactsTextField(
                 color = colorBasedOnValidity(validityState)
             )
             Text(
-                text = "*",
+                text = stringResource(R.string.required_field_star),
                 style = typography.labelMedium
             )
         }
@@ -142,7 +151,7 @@ fun ContactsTextField(
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    text = "Поле не может быть пустым",
+                    text = stringResource(R.string.textfield_empty_bottomtext),
                     style = typography.labelMedium,
                     color = ErrorColor
                 )
@@ -171,8 +180,9 @@ fun PasswordTextField(
     textFieldType: PasswordTextFieldTypes,
     validityState: TextFieldValidityState = TextFieldValidityState.Valid
 ) {
+    val placeholder =
+        stringResource(R.string.textfield_placeholder_prefix) + " " + textFieldType.text.lowercase() + "..."
     val isPlaceholderDisplayed = remember { mutableStateOf(true) }
-    val placeholder = "Enter your ${textFieldType.text.lowercase()}..."
     val isPasswordVisible = remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.Center,
@@ -190,7 +200,7 @@ fun PasswordTextField(
             )
             if (textFieldType == PasswordTextFieldTypes.Password) {
                 Text(
-                    text = "*",
+                    text = stringResource(R.string.required_field_star),
                     style = typography.labelMedium
                 )
             }
@@ -254,7 +264,7 @@ fun PasswordTextField(
                                 else
                                     R.drawable.ic_dont_show_password
                             ),
-                            contentDescription = "Show password",
+                            contentDescription = stringResource(R.string.password_icon_description),
                             tint = colorBasedOnValidity(validityState),
                         )
                     }
@@ -268,9 +278,9 @@ fun PasswordTextField(
             ) {
                 Text(
                     text = if (validityState == TextFieldValidityState.Invalid)
-                        "Неверный пароль, повторите попытку"
+                        stringResource(R.string.textfield_invalid_password_bottomtext)
                     else
-                        "Поле не может быть пустым",
+                        stringResource(R.string.textfield_empty_bottomtext),
                     style = typography.labelMedium,
                     color = ErrorColor
                 )

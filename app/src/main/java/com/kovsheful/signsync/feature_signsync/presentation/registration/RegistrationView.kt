@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,6 +56,7 @@ internal fun RegistrationView(
     fun onRegistration() {
         viewModel.onSubmitClicked()
         if (state.isNameValid && state.isEmailValid && state.isPasswordValid &&
+            // bools above doesn`t affected by changes in onSubmitClicked, so check empty explicitly
             state.email.isNotEmpty() && state.name.isNotEmpty() && state.password.isNotEmpty()) {
             // Avoid back navigation to Registration screen with popUpTo
             navigator.navigate(route = "Profile") {
@@ -127,7 +129,7 @@ private fun RegistrationView(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Welcome aboard!",
+                        text = stringResource(R.string.welcome_text),
                         style = typography.displayMedium,
 
                         )
@@ -178,14 +180,14 @@ private fun RegistrationView(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Text(
-                        text = "* - required field",
+                        text = stringResource(R.string.required_field_hint_text),
                         style = typography.labelMedium
                     )
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 SubmitButton(
                     onClick = onRegistration,
-                    buttonText = "Sign up"
+                    buttonText = stringResource(R.string.registration_button_text)
                 )
             }
         }

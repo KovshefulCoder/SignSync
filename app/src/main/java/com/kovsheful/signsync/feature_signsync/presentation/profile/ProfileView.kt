@@ -27,10 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kovsheful.signsync.R
 import com.kovsheful.signsync.feature_signsync.core.util.ResourceStatus
 import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextField
 import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextFieldTypes
@@ -67,8 +70,8 @@ internal fun ProfileView() {
 @Composable
 fun PrevProfileView() {
     ProfileView(
-        name = "Денис",
-        email = "2323set@gmail.com",
+        name = "Денc",
+        email = "2323@gmail.com",
         onPasswordChanged = { _, _ -> },
         onChangePassword = {},
         currentPassword = "",
@@ -132,8 +135,10 @@ private fun ProfileView(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Welcome, $name!",
-                        style = typography.displayMedium
+                        text = stringResource(R.string.profile_welcome_text) + "$name!",
+                        style = typography.displayMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 Spacer(modifier = Modifier.height(32.dp))
@@ -164,13 +169,13 @@ private fun ProfileView(
                                 horizontalArrangement = Arrangement.Start
                             ) {
                                 Text(
-                                    text = "Contacts",
+                                    text = stringResource(R.string.contacts_title_text),
                                     style = typography.bodyMedium
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Icon(
                                     imageVector = Icons.Filled.Edit,
-                                    contentDescription = "Edit",
+                                    contentDescription = stringResource(R.string.contacts_editicon_description),
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -183,14 +188,17 @@ private fun ProfileView(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Name",
+                                    text = stringResource(R.string.name_conatacts_list_text),
+                                    modifier = Modifier.padding(end = 8.dp),
                                     style = typography.bodySmall.copy(
                                         color = SecondaryText
-                                    )
+                                    ),
                                 )
                                 Text(
                                     text = name,
-                                    style = typography.bodySmall
+                                    style = typography.bodySmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                             Spacer(modifier = Modifier.height(16.dp))
@@ -202,14 +210,17 @@ private fun ProfileView(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Email",
+                                    text = stringResource(R.string.email_conatacts_list_text),
+                                    modifier = Modifier.padding(end = 8.dp),
                                     style = typography.bodySmall.copy(
                                         color = SecondaryText
                                     )
                                 )
                                 Text(
                                     text = email,
-                                    style = typography.bodySmall
+                                    style = typography.bodySmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -222,7 +233,7 @@ private fun ProfileView(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Update password",
+                        text = stringResource(R.string.update_password_title_text),
                         style = typography.titleMedium
                     )
                 }
@@ -256,7 +267,7 @@ private fun ProfileView(
                 Spacer(modifier = Modifier.height(48.dp))
                 SubmitButton(
                     onClick = onChangePassword,
-                    buttonText = "Change password"
+                    buttonText = stringResource(R.string.profile_editsubmit_button_text)
                 )
             }
         }

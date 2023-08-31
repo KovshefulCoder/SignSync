@@ -29,7 +29,6 @@ class RegistrationViewModel @Inject constructor(
 
     fun updateDataField(fieldName: RegistrationScreenTextFieldTypes, fieldValue: String) {
         viewModelScope.launch {
-            Log.i("RegistrationViewModel", state.value.toString() + "new: $fieldValue")
             _state.update { value ->
                 when (fieldName) {
                     RegistrationScreenTextFieldTypes.Name -> value.copy(

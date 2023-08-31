@@ -30,12 +30,6 @@ object SignAndSyncModule {
         ).fallbackToDestructiveMigration().build()
     }
 
-//    @Provides
-//    @Singleton
-//    fun provideCocktailsDao(database: SignAndSyncDatabase): UserDao {
-//        return database.UserDao()
-//    }
-
     @Provides
     @Singleton
     fun provideSignAndSyncRepository(
