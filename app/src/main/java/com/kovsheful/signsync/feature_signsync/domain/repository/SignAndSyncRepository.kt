@@ -5,4 +5,6 @@ import com.kovsheful.signsync.feature_signsync.domain.models.User
 interface SignAndSyncRepository {
     suspend fun getUser(): User
     suspend fun upsert(user: User)
+    suspend fun getUserPasswordByID(id: Int): String
+    suspend fun clearUser()
 }

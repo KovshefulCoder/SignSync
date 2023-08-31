@@ -6,7 +6,9 @@ import com.kovsheful.signsync.feature_signsync.data.local.SignAndSyncDatabase
 import com.kovsheful.signsync.feature_signsync.data.repository.SignAndSyncRepositoryImpl
 import com.kovsheful.signsync.feature_signsync.domain.repository.SignAndSyncRepository
 import com.kovsheful.signsync.feature_signsync.domain.use_cases.AddOrUpdateUser
+import com.kovsheful.signsync.feature_signsync.domain.use_cases.ClearUserOnStart
 import com.kovsheful.signsync.feature_signsync.domain.use_cases.GetUser
+import com.kovsheful.signsync.feature_signsync.domain.use_cases.GetUserPasswordByID
 import com.kovsheful.signsync.feature_signsync.domain.use_cases.UserUseCases
 import dagger.Module
 import dagger.Provides
@@ -49,7 +51,9 @@ object SignAndSyncModule {
     ): UserUseCases {
         return UserUseCases(
             getUser = GetUser(repository),
-            addUser = AddOrUpdateUser(repository)
+            addOrUpdateUser = AddOrUpdateUser(repository),
+            getUserPasswordByID = GetUserPasswordByID(repository),
+            clearUserOnStart = ClearUserOnStart(repository)
         )
     }
 

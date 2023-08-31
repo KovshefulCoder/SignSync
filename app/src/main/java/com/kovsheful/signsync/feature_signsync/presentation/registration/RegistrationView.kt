@@ -32,8 +32,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kovsheful.signsync.R
 import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextField
-import com.kovsheful.signsync.feature_signsync.presentation.core.ContactsTextFieldType
+import com.kovsheful.signsync.feature_signsync.presentation.core.RegistrationScreenTextFieldTypes
 import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextField
+import com.kovsheful.signsync.feature_signsync.presentation.core.PasswordTextFieldTypes
 import com.kovsheful.signsync.feature_signsync.presentation.core.TextFieldValidityState
 import com.kovsheful.signsync.ui.theme.Background
 import com.kovsheful.signsync.ui.theme.PrimaryColor
@@ -41,22 +42,30 @@ import com.kovsheful.signsync.ui.theme.typography
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.yield
 
 @RootNavGraph(start = true)
-@Destination
+@Destination("Registration")
 @Composable
 internal fun RegistrationView(
     navigator: DestinationsNavigator
 ) {
     val viewModel: RegistrationViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    RegistrationView(
-        onRegistration = {
-            viewModel.onSubmitClicked()
-            if (state.isNameValid && state.isEmailValid && state.isPasswordValid) {
-                Log.i("RegistrationView", "Success")
+    fun onRegistration() {
+        viewModel.onSubmitClicked()
+        if (state.isNameValid && state.isEmailValid && state.isPasswordValid &&
+            state.email.isNotEmpty() && state.name.isNotEmpty() && state.password.isNotEmpty()) {
+            // Avoid back navigation to Registration screen with popUpTo
+            navigator.navigate(route = "Profile") {
+                popUpTo("Registration") {
+                    inclusive = true
+                }
             }
-        },
+        }
+    }
+    RegistrationView(
+        onRegistration = { onRegistration() },
         name = state.name,
         email = state.email,
         password = state.password,
@@ -84,7 +93,7 @@ private fun RegistrationView(
     name: String,
     email: String,
     password: String,
-    onDataChanged: (ContactsTextFieldType, String) -> Unit,
+    onDataChanged: (RegistrationScreenTextFieldTypes, String) -> Unit,
     textFieldsValidity: Triple<Boolean, Boolean, Boolean>
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
@@ -127,9 +136,9 @@ private fun RegistrationView(
                 ContactsTextField(
                     value = name,
                     onValueChange = { newValue ->
-                        onDataChanged(ContactsTextFieldType.Name, newValue)
+                        onDataChanged(RegistrationScreenTextFieldTypes.Name, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Name,
+                    textFieldType = RegistrationScreenTextFieldTypes.Name,
                     validityState = if (textFieldsValidity.first) {
                         TextFieldValidityState.Valid
                     } else {
@@ -140,9 +149,9 @@ private fun RegistrationView(
                 ContactsTextField(
                     value = email,
                     onValueChange = { newValue ->
-                        onDataChanged(ContactsTextFieldType.Email, newValue)
+                        onDataChanged(RegistrationScreenTextFieldTypes.Email, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Email,
+                    textFieldType = RegistrationScreenTextFieldTypes.Email,
                     validityState = if (textFieldsValidity.second) {
                         TextFieldValidityState.Valid
                     } else {
@@ -153,9 +162,9 @@ private fun RegistrationView(
                 PasswordTextField(
                     value = password,
                     onValueChange = { newValue ->
-                        onDataChanged(ContactsTextFieldType.Password, newValue)
+                        onDataChanged(RegistrationScreenTextFieldTypes.Password, newValue)
                     },
-                    textFieldType = ContactsTextFieldType.Password,
+                    textFieldType = PasswordTextFieldTypes.Password,
                     validityState = if (textFieldsValidity.third) {
                         TextFieldValidityState.Valid
                     } else {
@@ -175,7 +184,8 @@ private fun RegistrationView(
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 SubmitButton(
-                    onClick = onRegistration
+                    onClick = onRegistration,
+                    buttonText = "Sign up"
                 )
             }
         }
@@ -184,8 +194,8 @@ private fun RegistrationView(
 
 @Composable
 fun SubmitButton(
-    buttonText: String = "Sign up",
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    buttonText: String,
 ) {
     Button(
         onClick = onClick,
